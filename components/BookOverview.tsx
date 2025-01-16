@@ -28,7 +28,7 @@ const BookOverview = ({
 
         <Button className="book-overview_btn">
           <Image src="/icons/book.svg" alt="book" width={20} height={20} />
-          <p className="font-bebas-neue text-xl text-dark-100">Voir ce livre</p>
+          <p className="font-bebas-neue text-xl text-dark-100">Voir</p>
         </Button>
       </div>
 
