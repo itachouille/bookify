@@ -31,9 +31,11 @@ export const getBook = async (
 
     const data: { docs: Book[] } = await response.json();
 
+    // Transformation des données
     const booksWithDetails = data.docs.map((book) => {
-      const title = book.title || "Unknown Title";
-      const author = book.author_name ? book.author_name[0] : "Unknown Author";
+      const title = book.title?.toLowerCase().trim() || "Unknown Title"; // Normalisation des titres
+      const author =
+        book.author_name?.[0]?.toLowerCase().trim() || "Unknown Author"; // Normalisation des auteurs
       const year = book.first_publish_year || 0;
       const coverUrl = book.cover_i
         ? `https://covers.openlibrary.org/b/ID/${book.cover_i}-L.jpg`
@@ -42,7 +44,31 @@ export const getBook = async (
       return { title, author, year, coverUrl };
     });
 
-    return booksWithDetails;
+    // Filtrage pour éliminer les doublons
+    const uniqueBooks = Object.values(
+      booksWithDetails.reduce(
+        (acc, book) => {
+          const normalizedTitle = book.title
+            .replace(/[^a-z0-9\s]/gi, "") // Supprime caractères spéciaux
+            .replace(/\s+/g, " ") // Réduit espaces multiples
+            .trim();
+          const key = `${normalizedTitle}|${book.author}`; // Clé normalisée
+
+          if (!acc[key] || book.year > acc[key].year) {
+            // Conserver si l'entrée est nouvelle ou plus récente
+            acc[key] = book;
+          }
+
+          return acc;
+        },
+        {} as Record<
+          string,
+          { title: string; author: string; year: number; coverUrl: string }
+        >
+      )
+    );
+
+    return uniqueBooks;
   } catch (error) {
     console.error("Error fetching books:", error);
     return [];
