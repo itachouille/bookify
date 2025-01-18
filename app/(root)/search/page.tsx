@@ -1,10 +1,10 @@
 "use client";
 
-import { getBook } from "@/app/api/library/route";
+import { useState, FormEvent } from "react";
 import BookList from "@/components/BookList";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState, FormEvent } from "react";
+import { getBook } from "@/lib/actions/book";
 
 const Page: React.FC = () => {
   const [query, setQuery] = useState("");
@@ -22,6 +22,7 @@ const Page: React.FC = () => {
     try {
       const data = await getBook(query);
       setBooks(data);
+      console.log(data);
     } catch (error) {
       console.error("Error fetching books:", error);
     }
@@ -29,12 +30,12 @@ const Page: React.FC = () => {
 
   return (
     <>
-      <form onSubmit={handleSearch}>
+      <form onSubmit={handleSearch} className="search">
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Nom du livre"
-          className="mb-4 text-white"
+          className="search-input"
         />
         <Button type="submit" disabled={!query.trim()}>
           Chercher
